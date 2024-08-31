@@ -1,0 +1,8 @@
+APP_NAME = 'fastkart'
+DRIVER = 'mysql'
+DB_NAME = 'fastkart'
+DB_HOST = 'localhost'
+USER = 'root'
+PASSWORD = ''
+DEBUG=1
+CACHE = 1
