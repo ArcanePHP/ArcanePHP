@@ -1,0 +1,38 @@
+#!/usr/bin/env php
+<?php
+
+// Define default host and port
+$host = 'http//:localhost/fastkart';
+$port = '8000';
+
+// Check for CLI arguments for custom host and port
+$arguments = getopt("", ["host::", "port::"]);
+if (isset($arguments['host'])) {
+    $host = $arguments['host'];
+}
+if (isset($arguments['port'])) {
+    $port = $arguments['port'];
+}
+
+// Define the public directory (typically where index.php is located)
+$publicDirectory = __DIR__ . '/public';
+
+// Check if the public directory exists
+if (!is_dir($publicDirectory)) {
+    echo "Error: The public directory does not exist at $publicDirectory\n";
+    exit(1);
+}
+
+// Command to start the built-in PHP server
+$command = sprintf(
+    'php -S %s:%s -t %s',
+    $host,
+    $port,
+    $publicDirectory
+);
+
+echo "Starting development server on http://$host:$port\n";
+echo "Press Ctrl+C to stop the server\n";
+
+// Execute the command to start the server
+passthru($command);

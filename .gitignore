@@ -6,3 +6,4 @@ framework-issues.txt
 /vendor
 /node_modules
 /public/uploads
+    /vendor/

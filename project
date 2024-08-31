@@ -42,12 +42,48 @@ if (preg_match($pattern, $command, $matches)) {
 
 
 switch (true) {
+    case $command === 'serve':
+        // Define default host and port
+        $host = '127.0.0.1';
+        $port = '8000';
+
+        // Check for CLI arguments for custom host and port
+        $arguments = getopt("", ["host::", "port::"]);
+        if (isset($arguments['host'])) {
+            $host = $arguments['host'];
+        }
+        if (isset($arguments['port'])) {
+            $port = $arguments['port'];
+        }
+
+        $publicDirectory = __DIR__ . '/public';
+   
+        // Check if the public directory exists
+        if (!is_dir($publicDirectory)) {
+            echo "Error: The public directory does not exist at $publicDirectory\n";
+            exit(1);
+        }
+
+        // Command to start the built-in PHP server
+        $command = sprintf(
+            'php -S %s:%s -t %s',
+            $host,
+            $port,
+            $publicDirectory
+        );
+
+        echo "Starting development server on http://$host:$port\n";
+        echo "Press Ctrl+C to stop the server\n";
+
+        // Execute the command to start the server
+        passthru($command);
+        break;
     case $command === 'runquery':
         if ($command2 === null) {
             echo "Please provide a query name.\n";
             exit();
         }
-        $query = new QueryRunner($db, $command2);
+        // $query = new QueryRunner($db, $command2);
         break;
     case $command === 'migrate':
         $migrate = new Migratables();

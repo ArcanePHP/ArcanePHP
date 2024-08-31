@@ -1,7 +1,7 @@
 <?php
 //
 declare(strict_types=1);
-use Core\Cache;
+
 use Core\Application;
 use Core\Config;
 use Core\Router;
@@ -25,10 +25,17 @@ $app = new Application(new Config($_ENV));
 
 
 // $router = new Router();
-$url = $_SERVER['QUERY_STRING'];
+// dd($_SERVER);
+// dd($url);
+$url = $_SERVER['QUERY_STRING'] ?? false;
+if (!$url) {
+    $url = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+}
+// dd($url);
+
+// dd($scheme);
 // if ($_ENV['DEBUG']&& $_ENV['cache']) {
 if (Config::CACHE && Config::DEBUG_MODE) {
-
 } else {
     $router = Router::getInstance();
     // dd($router);
