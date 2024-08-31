@@ -1,0 +1,124 @@
+#!/usr/bin/env php
+<?php
+
+use Core\Application;
+use Core\Cache;
+use Core\Config;
+use Core\Helpers;
+use Core\JavaScript;
+use Core\Router;
+use Core\UserHelper;
+use Database\Migratables;
+use Migration\QueryRunner;
+
+// Autoload dependencies
+require __DIR__ . '/vendor/autoload.php';
+require __DIR__ . '/Core/Init.php';
+// require __DIR__ . '/public/index.php';
+// Simple command-line argument parsing
+$command = $argv[1] ?? null;
+$command2 = $argv[2] ?? null;
+$app = new Application(new Config($_ENV));
+$db = $app::$db;
+
+$commandType = '';
+// Helpers::dd($argv[2]);
+$pattern = '/^ajax-([\w-]+):([\w-]+):needs-([\w-]+):([\w-].+)(?:\s*--(\w+))?$/';
+
+$ajax_command = '';
+// $command = 'ajax-favorite:addToFav:needs-product:product_id --post';
+// Helpers::dd($command);
+if (preg_match($pattern, $command, $matches)) {
+    $commandType = 'ajax-execute-command';
+    $ajax_command = $matches;
+    // Helpers::dd($matches);
+} elseif (preg_match('/^ajax/', $command)) {
+    $commandType = 'ajax-help';
+}
+// Helpers::dd($matches);
+
+// Helpers::dd($commandType);
+
+
+
+switch (true) {
+    case $command === 'runquery':
+        if ($command2 === null) {
+            echo "Please provide a query name.\n";
+            exit();
+        }
+        $query = new QueryRunner($db, $command2);
+        break;
+    case $command === 'migrate':
+        $migrate = new Migratables();
+        break;
+    case preg_match('/^create-controller-(\w+)$/', $command, $matches):
+        $controllerName = $matches[1];
+        echo UserHelper::makeController($controllerName);
+    case preg_match('/^create-model-(\w+)$/', $command, $matches):
+        $modelName = $matches[1];
+        // ModelController::createModelAction($modelName);
+        break;
+    case preg_match('/^create-table-(\w+)$/', $command, $matches):
+        $tableName = $matches[1];
+        $className = "Migration\\{$tableName}Table";
+
+        if (class_exists($className)) {
+            // $db = new DB(); // Assuming $db is your database connection object
+            $migration = new $className($db);
+            echo "Table {$tableName} created successfully.";
+        } else {
+            echo "Class $className does not exist.";
+        }
+        // TableController::createTableAction($tableName);
+        break;
+    case $commandType == 'ajax-execute-command':
+
+        // echo 'ajax';
+        // Helpers::dd($ajax_command);
+        $requestMethod = !empty($ajax_command[5]) ? $ajax_command[5] : (isset($argv[2]) ? $argv[2] : null);
+        // Helpers::dd($requestMethod);
+        if (!$requestMethod) {
+            echo 'plese pass a request method' . PHP_EOL;
+            echo 'ajax-[html classname]:[urlname]:needs-[[table name]:[column name,..]] --[request method]' . PHP_EOL;
+        } else {
+            // Helpers::dd($ajax_command);
+            $urlName = $ajax_command[2];
+            $ajax_command['method'] = $requestMethod;
+            $medhod = $requestMethod;
+            // JavaScript::class;
+            // $ajax->url = $urlName;
+            // dd(Router::getRoutesWithName());
+            $routes = Router::getRoutesWithName();
+            if (isset($routes[$urlName])) {
+                $route = $routes[$urlName];
+                JavaScript::ajax($ajax_command, $route);
+            } else {
+                echo 'Route named ' . $urlName . ' not found . ' . PHP_EOL;
+                echo '1:Please check the name or create a route with name' . PHP_EOL;
+                echo '2:Refresh the web page and run command again' . PHP_EOL;
+            }
+
+
+
+            // Cache::set
+            // setCacheItem() 
+        }
+
+        // Helpers::
+        // dd($ajax_command);
+        // echo $matches;
+        break;
+    case $commandType == 'ajax-help':
+        if (count($matches) == 0) {
+            echo 'Needs parameter to function : ' . PHP_EOL;
+            echo 'ajax-[classname]:[urlname]:needs-[[table name]:[column name]] --[request method]' . PHP_EOL;
+            echo 'command given ' . $command . PHP_EOL;
+        }
+
+        break;
+    default:
+        echo "Unknown command: $command\n";
+        echo "Available commands: migrate, create-model-{ModelName}, create-table-{TableName}, runquery {QueryName}\n";
+        break;
+}

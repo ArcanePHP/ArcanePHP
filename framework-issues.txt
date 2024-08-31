@@ -1,0 +1,9 @@
+rejext issue on ajax comm :$pattern = '/^ajax-([\w-]+):([\w-]+):needs-([\w-]+):([\w-]+)(?:\s*--([\w]+))?$/';
+on project.php
+
+caching need  on : Model::getTableInfo , core/twigExtention::for , 
+
+
+need error handlings in ajax  , file : project line :97
+
+

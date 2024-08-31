@@ -1,0 +1,23 @@
+{
+    "require": {
+        "twig/twig": "^3.7",
+        "symfony/asset": "^6.3",
+        "vlucas/phpdotenv": "^5.6",
+        "phpfastcache/phpfastcache": "^9.2",
+        "vlucas/valitron": "^1.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "App/",
+            "Core\\": "Core/",
+            "Models\\": "Models\\",
+            "Migration\\": "Migration\\",
+            "Database\\": "Database\\"
+        }
+    },
+    "...": "...",
+    "extra": {
+        "...": "...",
+        "public-dir": "App"
+    }
+}
